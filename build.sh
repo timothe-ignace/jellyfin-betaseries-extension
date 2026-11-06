@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Compile le plugin avec le SDK .NET 10 via Docker et prépare dist/BetaSeries_<version>/
-# Usage : ./build.sh [dossier_plugins_jellyfin]   (ex. ./build.sh ~/docker/jellyfin/config/plugins)
+# Builds the plugin with the .NET 10 SDK via Docker and prepares dist/BetaSeries_<version>/
+# Usage: ./build.sh [jellyfin_plugins_dir]   (e.g. ./build.sh ~/docker/jellyfin/config/plugins)
 set -euo pipefail
 cd "$(dirname "$0")"
 VERSION=$(python3 -c 'import json;print(json.load(open("meta.json"))["version"])')
@@ -11,9 +11,9 @@ docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e DOTNET_CLI_HOME=/tmp 
   mcr.microsoft.com/dotnet/sdk:10.0 dotnet build -c Release -o /src/build-out
 scripts/package.sh build-out >/dev/null
 rm -rf build-out
-echo "Plugin prêt dans $OUT"
+echo "Plugin ready in $OUT"
 if [[ $# -ge 1 ]]; then
   mkdir -p "$1/BetaSeries_${VERSION}"
   cp "$OUT"/* "$1/BetaSeries_${VERSION}/"
-  echo "Copié dans $1/BetaSeries_${VERSION} — redémarrez Jellyfin."
+  echo "Copied to $1/BetaSeries_${VERSION} — restart Jellyfin."
 fi

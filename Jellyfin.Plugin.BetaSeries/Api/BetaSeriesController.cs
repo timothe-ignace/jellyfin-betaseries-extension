@@ -11,7 +11,7 @@ public class LoginRequest { public string Login { get; set; } = string.Empty; pu
 
 public class TokenRequest { public string Token { get; set; } = string.Empty; }
 
-/// <summary>Endpoints utilisés par la page de profil : chaque utilisateur ne gère que son propre token.</summary>
+/// <summary>Endpoints used by the profile page: each user only manages their own token.</summary>
 [ApiController]
 [Authorize]
 [Route("BetaSeries")]
@@ -32,7 +32,7 @@ public partial class BetaSeriesController : ControllerBase
 
     private Guid? CurrentUserId()
     {
-        // Jellyfin place l'ID utilisateur dans le claim "Jellyfin-UserId"
+        // Jellyfin puts the user ID in the "Jellyfin-UserId" claim
         var raw = User.FindFirstValue("Jellyfin-UserId");
         return Guid.TryParse(raw, out var id) ? id : null;
     }
@@ -54,10 +54,10 @@ public partial class BetaSeriesController : ControllerBase
     {
         var uid = CurrentUserId();
         if (uid is null) { return Unauthorized(); }
-        if (string.IsNullOrEmpty(Plugin.Instance?.Configuration.ApiKey)) { return BadRequest(new { Error = "Le plugin n'est pas configuré (clé API manquante)." }); }
+        if (string.IsNullOrEmpty(Plugin.Instance?.Configuration.ApiKey)) { return BadRequest(new { Error = "The plugin is not configured (missing API key)." }); }
         if (string.IsNullOrWhiteSpace(req?.Login) || string.IsNullOrEmpty(req.Password) || req.Login.Length > 128 || req.Password.Length > 256)
         {
-            return BadRequest(new { Error = "Identifiant ou mot de passe invalide." });
+            return BadRequest(new { Error = "Invalid login or password." });
         }
 
         var (token, error) = await _client.LoginAsync(req.Login, req.Password, ct).ConfigureAwait(false);
@@ -71,11 +71,11 @@ public partial class BetaSeriesController : ControllerBase
     {
         var uid = CurrentUserId();
         if (uid is null) { return Unauthorized(); }
-        if (string.IsNullOrEmpty(Plugin.Instance?.Configuration.ApiKey)) { return BadRequest(new { Error = "Le plugin n'est pas configuré (clé API manquante)." }); }
+        if (string.IsNullOrEmpty(Plugin.Instance?.Configuration.ApiKey)) { return BadRequest(new { Error = "The plugin is not configured (missing API key)." }); }
         var token = req?.Token?.Trim() ?? string.Empty;
-        if (!TokenPattern().IsMatch(token)) { return BadRequest(new { Error = "Format de token invalide." }); }
+        if (!TokenPattern().IsMatch(token)) { return BadRequest(new { Error = "Invalid token format." }); }
         var login = await _client.GetLoginAsync(token, ct).ConfigureAwait(false);
-        if (login is null) { return BadRequest(new { Error = "Token invalide." }); }
+        if (login is null) { return BadRequest(new { Error = "Invalid token." }); }
         _tokens.Set(uid.Value, token);
         return Ok(new { Login = login });
     }

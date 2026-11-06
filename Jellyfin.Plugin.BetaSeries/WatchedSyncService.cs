@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.BetaSeries;
 
-/// <summary>Écoute les changements d'état "vu" et les pousse vers BetaSeries.</summary>
+/// <summary>Listens for "watched" state changes and pushes them to BetaSeries.</summary>
 public class WatchedSyncService : IHostedService
 {
     private readonly IUserDataManager _userData;
@@ -45,7 +45,7 @@ public class WatchedSyncService : IHostedService
 
         if (e.UserData is null || !e.UserData.Played)
         {
-            return; // on ne synchronise que "marqué comme vu"
+            return; // only sync "marked as watched"
         }
 
         var token = _tokens.Get(e.UserId);
@@ -55,7 +55,7 @@ public class WatchedSyncService : IHostedService
         _ = Task.Run(async () =>
         {
             try { await SyncAsync(item, token).ConfigureAwait(false); }
-            catch (Exception ex) { _log.LogError(ex, "Erreur de synchro BetaSeries pour {Item}", item.Name); }
+            catch (Exception ex) { _log.LogError(ex, "BetaSeries sync error for {Item}", item.Name); }
         });
     }
 
@@ -69,11 +69,11 @@ public class WatchedSyncService : IHostedService
             if (ep.TryGetProviderId(MetadataProvider.Tvdb, out var tvdb) && !string.IsNullOrEmpty(tvdb))
             {
                 var ok = await _client.MarkEpisodeWatchedAsync(token, tvdb, CancellationToken.None).ConfigureAwait(false);
-                _log.LogInformation("BetaSeries : {Series} S{S}E{E} -> {Result}", ep.SeriesName, ep.ParentIndexNumber, ep.IndexNumber, ok ? "ok" : "échec");
+                _log.LogInformation("BetaSeries: {Series} S{S}E{E} -> {Result}", ep.SeriesName, ep.ParentIndexNumber, ep.IndexNumber, ok ? "ok" : "failed");
             }
             else
             {
-                _log.LogInformation("BetaSeries : pas d'ID TVDB pour {Series} S{S}E{E}, ignoré", ep.SeriesName, ep.ParentIndexNumber, ep.IndexNumber);
+                _log.LogInformation("BetaSeries: no TVDB ID for {Series} S{S}E{E}, skipped", ep.SeriesName, ep.ParentIndexNumber, ep.IndexNumber);
             }
         }
         else if (item is Movie movie && cfg.SyncMovies)
@@ -81,7 +81,7 @@ public class WatchedSyncService : IHostedService
             movie.TryGetProviderId(MetadataProvider.Imdb, out var imdb);
             movie.TryGetProviderId(MetadataProvider.Tmdb, out var tmdb);
             var ok = await _client.MarkMovieWatchedAsync(token, imdb, tmdb, CancellationToken.None).ConfigureAwait(false);
-            _log.LogInformation("BetaSeries : film {Movie} -> {Result}", movie.Name, ok ? "ok" : "échec");
+            _log.LogInformation("BetaSeries: movie {Movie} -> {Result}", movie.Name, ok ? "ok" : "failed");
         }
     }
 }

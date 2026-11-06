@@ -47,7 +47,7 @@ public class BetaSeriesClient
         return (resp.IsSuccessStatusCode, json, raw);
     }
 
-    /// <summary>Échange login/mot de passe contre un token. Le mot de passe n'est jamais conservé.</summary>
+    /// <summary>Exchanges login/password for a token. The password is never stored.</summary>
     public async Task<(string? Token, string? Error)> LoginAsync(string login, string password, CancellationToken ct)
     {
         var md5 = Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(password))).ToLowerInvariant();
@@ -58,10 +58,10 @@ public class BetaSeriesClient
             return (t.GetString(), null);
         }
 
-        return (null, ExtractError(json) ?? "Échec de connexion à BetaSeries.");
+        return (null, ExtractError(json) ?? "Could not sign in to BetaSeries.");
     }
 
-    /// <summary>Vérifie un token et renvoie le login associé.</summary>
+    /// <summary>Validates a token and returns the associated login.</summary>
     public async Task<string?> GetLoginAsync(string token, CancellationToken ct)
     {
         var (ok, json, _) = await SendAsync(HttpMethod.Get, "/members/infos", new Dictionary<string, string>(), token, ct).ConfigureAwait(false);
@@ -73,22 +73,22 @@ public class BetaSeriesClient
         return null;
     }
 
-    /// <summary>Marque un épisode (ID TVDB de l'épisode) comme vu, sans toucher aux épisodes précédents.</summary>
+    /// <summary>Marks an episode (by its TVDB episode ID) as watched, without touching previous episodes.</summary>
     public async Task<bool> MarkEpisodeWatchedAsync(string token, string tvdbEpisodeId, CancellationToken ct)
     {
         var (ok, json, raw) = await SendAsync(HttpMethod.Post, "/episodes/watched",
             new Dictionary<string, string> { ["thetvdb_id"] = tvdbEpisodeId, ["bulk"] = "false" }, token, ct).ConfigureAwait(false);
         if (!ok)
         {
-            // 2002 = épisode déjà vu : pas une vraie erreur
+            // 2002 = episode already watched: not a real error
             if (ExtractCode(json) == 2002) { return true; }
-            _log.LogWarning("BetaSeries episodes/watched a échoué : {Raw}", raw);
+            _log.LogWarning("BetaSeries episodes/watched failed: {Raw}", raw);
         }
 
         return ok;
     }
 
-    /// <summary>Marque un film comme vu (recherche par ID IMDb ou TMDb).</summary>
+    /// <summary>Marks a movie as watched (looked up by IMDb or TMDb ID).</summary>
     public async Task<bool> MarkMovieWatchedAsync(string token, string? imdbId, string? tmdbId, CancellationToken ct)
     {
         var q = new Dictionary<string, string>();
@@ -99,7 +99,7 @@ public class BetaSeriesClient
         var (ok, json, raw) = await SendAsync(HttpMethod.Get, "/movies/movie", q, token, ct).ConfigureAwait(false);
         if (!ok || json is null || !json.RootElement.TryGetProperty("movie", out var movie) || !movie.TryGetProperty("id", out var idEl))
         {
-            _log.LogWarning("BetaSeries : film introuvable ({Raw})", raw);
+            _log.LogWarning("BetaSeries: movie not found ({Raw})", raw);
             return false;
         }
 
@@ -107,7 +107,7 @@ public class BetaSeriesClient
             new Dictionary<string, string> { ["id"] = idEl.ToString(), ["state"] = "1" }, token, ct).ConfigureAwait(false);
         if (!ok2 && ExtractCode(json2) != 4001)
         {
-            _log.LogWarning("BetaSeries movies/movie a échoué : {Raw}", raw2);
+            _log.LogWarning("BetaSeries movies/movie failed: {Raw}", raw2);
             return false;
         }
 

@@ -20,15 +20,15 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: 10.0.x
-      - name: Vérifier la cohérence des versions
+      - name: Check version consistency
         run: |
           meta=$(python3 -c 'import json;print(json.load(open("meta.json"))["version"])')
           csproj=$(sed -n 's:.*<AssemblyVersion>\(.*\)</AssemblyVersion>.*:\1:p' Jellyfin.Plugin.BetaSeries/Jellyfin.Plugin.BetaSeries.csproj)
-          [ "$meta" = "$csproj" ] || { echo "::error::meta.json ($meta) et AssemblyVersion ($csproj) diffèrent"; exit 1; }
-          [[ "$meta" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::la version doit avoir 4 chiffres (X.Y.Z.W, format Jellyfin), trouvé $meta"; exit 1; }
-      - name: Compiler (warnings = erreurs)
+          [ "$meta" = "$csproj" ] || { echo "::error::meta.json ($meta) and AssemblyVersion ($csproj) differ"; exit 1; }
+          [[ "$meta" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::version must have 4 parts (X.Y.Z.W, Jellyfin format), found $meta"; exit 1; }
+      - name: Build (warnings as errors)
         run: dotnet build Jellyfin.Plugin.BetaSeries -c Release -warnaserror -o build-out
-      - name: Empaqueter
+      - name: Package
         run: scripts/package.sh build-out
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
