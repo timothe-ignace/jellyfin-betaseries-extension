@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head><meta charset="utf-8"><title>BetaSeries</title></head>
 <body>
 <div id="BetaSeriesConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
@@ -8,17 +8,17 @@
       <form id="BetaSeriesConfigForm">
         <h2>BetaSeries</h2>
         <div class="inputContainer">
-          <input is="emby-input" type="text" id="ApiKey" label="Clé API BetaSeries" />
-          <div class="fieldDescription">À créer sur https://www.betaseries.com/api/ (champ « Client ID »). Commune à tous les utilisateurs.</div>
+          <input is="emby-input" type="text" id="ApiKey" label="BetaSeries API key" />
+          <div class="fieldDescription">Create one at https://www.betaseries.com/api/ ("Client ID" field). Shared by all users.</div>
         </div>
         <div class="checkboxContainer checkboxContainer-withDescription">
           <label class="emby-checkbox-label">
             <input is="emby-checkbox" type="checkbox" id="SyncMovies" />
-            <span>Synchroniser aussi les films</span>
+            <span>Also sync movies</span>
           </label>
         </div>
-        <p>Chaque utilisateur lie son propre compte depuis le menu « BetaSeries » de son profil.</p>
-        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Enregistrer</span></button>
+        <p>Each user links their own account from the "BetaSeries" entry in their preferences.</p>
+        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Save</span></button>
       </form>
     </div>
   </div>

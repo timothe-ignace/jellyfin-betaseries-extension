@@ -7,8 +7,8 @@ using Newtonsoft.Json.Linq;
 namespace Jellyfin.Plugin.BetaSeries;
 
 /// <summary>
-/// Enregistre le script du menu de profil auprès du plugin « JavaScript Injector » (via réflexion),
-/// pour ajouter l'entrée BetaSeries dans les préférences de chaque utilisateur.
+/// Registers the profile-menu script with the "JavaScript Injector" plugin (via reflection),
+/// to add a BetaSeries entry to each user's preferences menu.
 /// </summary>
 public class ProfileMenuInjector : IHostedService
 {
@@ -21,10 +21,10 @@ public class ProfileMenuInjector : IHostedService
     {
         _ = Task.Run(async () =>
         {
-            // On laisse le temps aux autres plugins d'être chargés.
+            // Give the other plugins time to finish loading.
             await Task.Delay(TimeSpan.FromSeconds(5), CancellationToken.None).ConfigureAwait(false);
             try { Register(); }
-            catch (Exception ex) { _log.LogWarning(ex, "BetaSeries : impossible d'enregistrer le script du menu profil"); }
+            catch (Exception ex) { _log.LogWarning(ex, "BetaSeries: could not register the profile menu script"); }
         }, CancellationToken.None);
         return Task.CompletedTask;
     }
@@ -38,8 +38,8 @@ public class ProfileMenuInjector : IHostedService
             .FirstOrDefault(a => a.FullName?.Contains(".JavaScriptInjector", StringComparison.Ordinal) ?? false);
         if (assembly is null)
         {
-            _log.LogWarning("BetaSeries : le plugin JavaScript Injector est absent, l'entrée de menu profil n'a pas été ajoutée " +
-                            "(la page reste accessible via #/configurationpage?name=BetaSeriesUser).");
+            _log.LogWarning("BetaSeries: the JavaScript Injector plugin is missing, the profile menu entry was not added " +
+                            "(the page is still reachable at #/configurationpage?name=BetaSeriesUser).");
             return;
         }
 
@@ -48,7 +48,7 @@ public class ProfileMenuInjector : IHostedService
         var payload = new JObject
         {
             ["id"] = ScriptId,
-            ["name"] = "BetaSeries - menu profil",
+            ["name"] = "BetaSeries - profile menu",
             ["script"] = script,
             ["enabled"] = true,
             ["requiresAuthentication"] = true,
@@ -61,12 +61,12 @@ public class ProfileMenuInjector : IHostedService
         var method = type?.GetMethod("RegisterScript", BindingFlags.Public | BindingFlags.Static);
         if (method is null)
         {
-            _log.LogWarning("BetaSeries : API RegisterScript introuvable dans JavaScript Injector.");
+            _log.LogWarning("BetaSeries: RegisterScript API not found in JavaScript Injector.");
             return;
         }
 
         var result = method.Invoke(null, new object[] { payload });
-        _log.LogInformation("BetaSeries : script du menu profil enregistré ({Result})", result);
+        _log.LogInformation("BetaSeries: profile menu script registered ({Result})", result);
     }
 
     private static string ReadScript()

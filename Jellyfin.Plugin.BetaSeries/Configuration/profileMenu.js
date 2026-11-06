@@ -1,4 +1,4 @@
-// Ajoute une entrée « BetaSeries » dans le menu des préférences du profil utilisateur.
+// Adds a "BetaSeries" entry to the user profile preferences menu.
 (function () {
   var CLASS = 'lnkBetaSeriesPreferences';
   function inject() {

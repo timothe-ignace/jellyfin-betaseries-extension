@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Ajoute (ou remplace) une version dans manifest.json.
+"""Adds (or replaces) a version in manifest.json.
 
-Usage : update-manifest.py <depot owner/name> <zip> <changelog>
-Lit meta.json (ou $META_PATH) pour les métadonnées du plugin, calcule le MD5 du zip.
+Usage: update-manifest.py <repo owner/name> <zip> <changelog>
+Reads meta.json (or $META_PATH) for the plugin metadata and computes the zip MD5.
 """
 import datetime
 import hashlib
@@ -34,4 +34,4 @@ plugin["versions"].insert(0, entry)
 with open("manifest.json", "w", encoding="utf-8") as f:
     json.dump(manifest, f, indent=2, ensure_ascii=False)
     f.write("\n")
-print(f"manifest.json : {version} (md5 {md5})")
+print(f"manifest.json: {version} (md5 {md5})")

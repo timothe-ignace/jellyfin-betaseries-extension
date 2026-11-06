@@ -2,14 +2,14 @@
   {
     "guid": "b7d3a1f2-5c64-4e8a-9a1d-3f0b6c2e7a91",
     "name": "BetaSeries",
-    "description": "Synchronise les épisodes et films vus avec BetaSeries (multi-utilisateur).",
+    "description": "Syncs watched episodes and movies to BetaSeries (multi-user).",
     "overview": "Sync BetaSeries",
     "owner": "Timothé IGNACE",
     "category": "General",
     "versions": [
       {
         "version": "1.0.1.0",
-        "changelog": "- SemVer (vX.Y.Z) et version 1.0.1 (#3) - Bump Newtonsoft.Json from 13.0.3 to 13.0.4 (#2) - CI, workflow de release et README utilisateur (#1) - Ajout du manifeste de dépôt de plugins pour la v1.0.0.0",
+        "changelog": "- Release automation (CI, release workflow, manifest)\n- Bump Newtonsoft.Json from 13.0.3 to 13.0.4",
         "targetAbi": "12.1.0.0",
         "sourceUrl": "https://github.com/timothe-ignace/jellyfin-betaseries-extension/releases/download/v1.0.1.0/BetaSeries_1.0.1.0.zip",
         "checksum": "ff8b93bc316a9965e08f0d2986130d43",
@@ -17,7 +17,7 @@
       },
       {
         "version": "1.0.0.0",
-        "changelog": "Première version : synchronisation multi-utilisateur des épisodes et films vus.",
+        "changelog": "Initial release: multi-user sync of watched episodes and movies.",
         "targetAbi": "12.1.0.0",
         "sourceUrl": "https://github.com/timothe-ignace/jellyfin-betaseries-extension/releases/download/v1.0.0.0/BetaSeries_1.0.0.0.zip",
         "checksum": "189a4558313f4fed0b45fa35ed7eee21",

@@ -1,6 +1,6 @@
 {
   "category": "General",
-  "description": "Synchronise les épisodes et films vus avec BetaSeries (multi-utilisateur).",
+  "description": "Syncs watched episodes and movies to BetaSeries (multi-user).",
   "guid": "b7d3a1f2-5c64-4e8a-9a1d-3f0b6c2e7a91",
   "name": "BetaSeries",
   "overview": "Sync BetaSeries",

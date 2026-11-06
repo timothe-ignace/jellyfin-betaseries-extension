@@ -19,7 +19,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 
     public override Guid Id => Guid.Parse("b7d3a1f2-5c64-4e8a-9a1d-3f0b6c2e7a91");
 
-    public override string Description => "Synchronise les épisodes et films vus avec BetaSeries (multi-utilisateur).";
+    public override string Description => "Syncs watched episodes and movies to BetaSeries (multi-user).";
 
     public IEnumerable<PluginPageInfo> GetPages()
     {

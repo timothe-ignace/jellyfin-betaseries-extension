@@ -1,30 +1,30 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head><meta charset="utf-8"><title>BetaSeries</title></head>
 <body>
 <div id="BetaSeriesUserPage" data-role="page" class="page type-interior" data-require="emby-input,emby-button">
   <div data-role="content">
     <div class="content-primary">
       <h2>BetaSeries</h2>
-      <p id="bsStatus">Chargement…</p>
+      <p id="bsStatus">Loading…</p>
       <p id="bsError" style="color:#e55"></p>
 
       <div id="bsLinked" style="display:none">
-        <button is="emby-button" type="button" id="bsUnlink" class="raised emby-button"><span>Délier mon compte</span></button>
+        <button is="emby-button" type="button" id="bsUnlink" class="raised emby-button"><span>Unlink my account</span></button>
       </div>
 
       <div id="bsUnlinked" style="display:none">
-        <h3>Connexion avec mon compte</h3>
+        <h3>Sign in with my account</h3>
         <form id="bsLoginForm">
-          <div class="inputContainer"><input is="emby-input" type="text" id="bsLogin" label="Identifiant BetaSeries" required /></div>
-          <div class="inputContainer"><input is="emby-input" type="password" id="bsPassword" label="Mot de passe" required /></div>
-          <div class="fieldDescription">Le mot de passe sert uniquement à obtenir un token, il n'est pas conservé.</div>
-          <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Se connecter</span></button>
+          <div class="inputContainer"><input is="emby-input" type="text" id="bsLogin" label="BetaSeries login" required /></div>
+          <div class="inputContainer"><input is="emby-input" type="password" id="bsPassword" label="Password" required /></div>
+          <div class="fieldDescription">The password is only used to obtain a token and is never stored.</div>
+          <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Sign in</span></button>
         </form>
-        <h3>Ou coller un token</h3>
+        <h3>Or paste a token</h3>
         <form id="bsTokenForm">
-          <div class="inputContainer"><input is="emby-input" type="text" id="bsToken" label="Token BetaSeries" required /></div>
-          <button is="emby-button" type="submit" class="raised block emby-button"><span>Enregistrer le token</span></button>
+          <div class="inputContainer"><input is="emby-input" type="text" id="bsToken" label="BetaSeries token" required /></div>
+          <button is="emby-button" type="submit" class="raised block emby-button"><span>Save token</span></button>
         </form>
       </div>
     </div>
@@ -43,7 +43,7 @@
         });
       }
       function showError(err) {
-        var msg = 'Erreur.';
+        var msg = 'Error.';
         if (err && err.json) { err.json().then(function (j) { q('#bsError').textContent = j.Error || msg; }).catch(function () { q('#bsError').textContent = msg; }); }
         else { q('#bsError').textContent = msg; }
         Dashboard.hideLoadingMsg();
@@ -53,10 +53,10 @@
         call('GET', 'Status').then(function (s) {
           q('#bsLinked').style.display = s.Linked ? '' : 'none';
           q('#bsUnlinked').style.display = s.Linked ? 'none' : '';
-          if (!s.ServerConfigured) { q('#bsStatus').textContent = "Le plugin n'est pas encore configuré par l'administrateur."; }
-          else if (s.Linked && s.Valid) { q('#bsStatus').textContent = 'Lié au compte BetaSeries : ' + s.Login; }
-          else if (s.Linked) { q('#bsStatus').textContent = 'Token enregistré mais invalide ou expiré : reconnectez-vous.'; q('#bsUnlinked').style.display = ''; }
-          else { q('#bsStatus').textContent = "Aucun compte lié : vos lectures ne sont pas synchronisées."; }
+          if (!s.ServerConfigured) { q('#bsStatus').textContent = "The plugin has not been configured by the administrator yet."; }
+          else if (s.Linked && s.Valid) { q('#bsStatus').textContent = 'Linked to BetaSeries account: ' + s.Login; }
+          else if (s.Linked) { q('#bsStatus').textContent = 'Saved token is invalid or expired: please sign in again.'; q('#bsUnlinked').style.display = ''; }
+          else { q('#bsStatus').textContent = "No account linked: your playback is not being synced."; }
           Dashboard.hideLoadingMsg();
         }, showError);
       }

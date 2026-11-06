@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Crée dist/BetaSeries_<version>.zip (DLL + meta.json) à partir d'un dossier de build.
-# Usage : scripts/package.sh <dossier_de_build>
+# Creates dist/BetaSeries_<version>.zip (DLL + meta.json) from a build directory.
+# Usage: scripts/package.sh <build_dir>
 set -euo pipefail
 cd "$(dirname "$0")/.."
-BUILD=${1:?usage: scripts/package.sh <dossier_de_build>}
+BUILD=${1:?usage: scripts/package.sh <build_dir>}
 VERSION=$(python3 -c 'import json;print(json.load(open("meta.json"))["version"])')
 STAGE="dist/BetaSeries_${VERSION}"
 rm -rf "$STAGE" "dist/BetaSeries_${VERSION}.zip" && mkdir -p "$STAGE"

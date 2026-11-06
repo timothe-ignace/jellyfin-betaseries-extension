@@ -4,7 +4,7 @@ using MediaBrowser.Common.Configuration;
 
 namespace Jellyfin.Plugin.BetaSeries;
 
-/// <summary>Stocke le token BetaSeries de chaque utilisateur Jellyfin, hors de la config admin.</summary>
+/// <summary>Stores each Jellyfin user's BetaSeries token, separately from the admin configuration.</summary>
 public class TokenStore
 {
     private readonly string _path;
@@ -25,7 +25,7 @@ public class TokenStore
                 }
             }
         }
-        catch (Exception) { /* fichier corrompu : on repart de zéro */ }
+        catch (Exception) { /* corrupted file: start from scratch */ }
     }
 
     public string? Get(Guid userId) => _tokens.TryGetValue(userId, out var t) ? t : null;
@@ -38,7 +38,7 @@ public class TokenStore
     {
         lock (_lock)
         {
-            // Écriture atomique : fichier temporaire créé directement en 0600, puis renommé.
+            // Atomic write: temporary file created directly with mode 0600, then renamed.
             var tmp = _path + ".tmp";
             var options = new FileStreamOptions { Mode = FileMode.Create, Access = FileAccess.Write };
             if (!OperatingSystem.IsWindows()) { options.UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite; }
