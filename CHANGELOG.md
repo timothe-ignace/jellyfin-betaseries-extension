@@ -2,7 +2,7 @@
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.0.2.0] - 2026-11-06
 
 ### Changed
 - Whole repository (code, UI, log and error messages, documentation, CI) translated to English.
