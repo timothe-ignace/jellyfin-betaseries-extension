@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }
+  - package-ecosystem: nuget
+    directory: /Jellyfin.Plugin.BetaSeries
+    schedule: { interval: monthly }
+    # Jellyfin.Controller doit rester aligné sur la version de Jellyfin ciblée : mise à jour manuelle.
+    ignore:
+      - dependency-name: Jellyfin.Controller

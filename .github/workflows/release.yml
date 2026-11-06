@@ -1,0 +1,56 @@
+name: Release
+
+# Déclenchée par un tag vX.Y.Z.W : compile, publie la release GitHub, met à jour manifest.json sur main.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Le tag doit correspondre aux versions du projet
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          meta=$(python3 -c 'import json;print(json.load(open("meta.json"))["version"])')
+          csproj=$(sed -n 's:.*<AssemblyVersion>\(.*\)</AssemblyVersion>.*:\1:p' Jellyfin.Plugin.BetaSeries/Jellyfin.Plugin.BetaSeries.csproj)
+          [ "$tag" = "$meta" ] && [ "$tag" = "$csproj" ] || { echo "::error::tag=$tag meta.json=$meta csproj=$csproj : incohérent"; exit 1; }
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main || { echo "::error::le tag doit pointer un commit de main"; exit 1; }
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: 10.0.x
+      - name: Compiler et empaqueter
+        run: |
+          dotnet build Jellyfin.Plugin.BetaSeries -c Release -warnaserror -o build-out
+          scripts/package.sh build-out
+      - name: Notes de version
+        run: |
+          prev=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)
+          range=${prev:+$prev..}${GITHUB_REF_NAME}
+          git log "$range" --no-merges --pretty='- %s' > "$RUNNER_TEMP/notes.md"
+          [ -s "$RUNNER_TEMP/notes.md" ] || echo "- Première version" > "$RUNNER_TEMP/notes.md"
+          cp dist/*.zip meta.json "$RUNNER_TEMP/"
+      - name: Publier la release GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/*.zip --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md"
+      - name: Mettre à jour manifest.json sur main
+        run: |
+          git fetch origin main
+          git checkout -B main origin/main
+          META_PATH="$RUNNER_TEMP/meta.json" scripts/update-manifest.py "$GITHUB_REPOSITORY" "$RUNNER_TEMP"/*.zip "$(tr '\n' ' ' < "$RUNNER_TEMP/notes.md" | sed 's/ *$//')"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "chore(release): manifest ${GITHUB_REF_NAME}"
+          git push origin HEAD:main
