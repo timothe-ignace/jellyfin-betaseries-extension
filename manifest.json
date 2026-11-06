@@ -8,6 +8,14 @@
     "category": "General",
     "versions": [
       {
+        "version": "1.0.3.0",
+        "changelog": "- Localize the plugin pages to the user's language (1.0.3.0) (#7) - chore(release): manifest v1.0.2.0",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/timothe-ignace/jellyfin-betaseries-extension/releases/download/v1.0.3.0/BetaSeries_1.0.3.0.zip",
+        "checksum": "a71fd336636d4bf82946856ead48b083",
+        "timestamp": "2026-11-06T21:41:20Z"
+      },
+      {
         "version": "1.0.2.0",
         "changelog": "- Release 1.0.2.0 (#6) - Translate the whole repository to English (#5) - Retour au versionnage à 4 chiffres X.Y.Z.W (#4) - chore(release): manifest v1.0.1",
         "targetAbi": "12.1.0.0",
