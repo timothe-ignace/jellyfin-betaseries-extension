@@ -26,6 +26,19 @@ jobs:
           csproj=$(sed -n 's:.*<AssemblyVersion>\(.*\)</AssemblyVersion>.*:\1:p' Jellyfin.Plugin.BetaSeries/Jellyfin.Plugin.BetaSeries.csproj)
           [ "$meta" = "$csproj" ] || { echo "::error::meta.json ($meta) and AssemblyVersion ($csproj) differ"; exit 1; }
           [[ "$meta" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::version must have 4 parts (X.Y.Z.W, Jellyfin format), found $meta"; exit 1; }
+      - name: Check JavaScript syntax
+        run: |
+          mkdir -p "$RUNNER_TEMP/js"
+          python3 - "$RUNNER_TEMP/js" <<'PY'
+          import glob, os, re, sys
+          out = sys.argv[1]
+          for f in glob.glob("Jellyfin.Plugin.BetaSeries/Configuration/*.html"):
+              for i, m in enumerate(re.finditer(r"<script[^>]*>(.*?)</script>", open(f, encoding="utf-8").read(), re.S)):
+                  open(os.path.join(out, f"{os.path.basename(f)}.{i}.js"), "w", encoding="utf-8").write(m.group(1))
+          PY
+          for f in "$RUNNER_TEMP"/js/*.js Jellyfin.Plugin.BetaSeries/Configuration/*.js; do
+            echo "node --check $f"; node --check "$f"
+          done
       - name: Check translations
         run: |
           python3 - <<'PY'
