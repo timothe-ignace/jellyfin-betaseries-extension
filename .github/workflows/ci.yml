@@ -25,7 +25,7 @@ jobs:
           meta=$(python3 -c 'import json;print(json.load(open("meta.json"))["version"])')
           csproj=$(sed -n 's:.*<AssemblyVersion>\(.*\)</AssemblyVersion>.*:\1:p' Jellyfin.Plugin.BetaSeries/Jellyfin.Plugin.BetaSeries.csproj)
           [ "$meta" = "$csproj" ] || { echo "::error::meta.json ($meta) et AssemblyVersion ($csproj) diffèrent"; exit 1; }
-          [[ "$meta" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.0$ ]] || { echo "::error::la version doit être X.Y.Z.0 (semver + .0 exigé par Jellyfin), trouvé $meta"; exit 1; }
+          [[ "$meta" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::la version doit avoir 4 chiffres (X.Y.Z.W, format Jellyfin), trouvé $meta"; exit 1; }
       - name: Compiler (warnings = erreurs)
         run: dotnet build Jellyfin.Plugin.BetaSeries -c Release -warnaserror -o build-out
       - name: Empaqueter

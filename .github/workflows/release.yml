@@ -3,7 +3,7 @@ name: Release
 # Déclenchée par un tag vX.Y.Z.W : compile, publie la release GitHub, met à jour manifest.json sur main.
 on:
   push:
-    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+    tags: ["v[0-9]+.[0-9]+.[0-9]+.[0-9]+"]
 
 permissions:
   contents: write
@@ -21,10 +21,10 @@ jobs:
           fetch-depth: 0
       - name: Le tag doit correspondre aux versions du projet
         run: |
-          tag="${GITHUB_REF_NAME#v}.0"
+          tag="${GITHUB_REF_NAME#v}"
           meta=$(python3 -c 'import json;print(json.load(open("meta.json"))["version"])')
           csproj=$(sed -n 's:.*<AssemblyVersion>\(.*\)</AssemblyVersion>.*:\1:p' Jellyfin.Plugin.BetaSeries/Jellyfin.Plugin.BetaSeries.csproj)
-          [ "$tag" = "$meta" ] && [ "$tag" = "$csproj" ] || { echo "::error::le tag ${GITHUB_REF_NAME} (soit $tag) doit correspondre à meta.json ($meta) et au csproj ($csproj)"; exit 1; }
+          [ "$tag" = "$meta" ] && [ "$tag" = "$csproj" ] || { echo "::error::le tag ${GITHUB_REF_NAME} doit correspondre à meta.json ($meta) et au csproj ($csproj)"; exit 1; }
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main || { echo "::error::le tag doit pointer un commit de main"; exit 1; }
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:

@@ -125,14 +125,13 @@ scripts/                      empaquetage et mise à jour du manifeste
 
 ### Publier une version
 
-Versionnage [SemVer](https://semver.org/lang/fr/) : `MAJOR.MINOR.PATCH` (correctif, nouveauté compatible, changement cassant).
-Jellyfin impose quatre chiffres : la version du plugin est donc `X.Y.Z.0` dans `meta.json` et le `.csproj`, tandis que le **tag git** est `vX.Y.Z`.
+Versionnage à **4 chiffres**, comme tous les plugins Jellyfin : `MAJOR.MINOR.PATCH.BUILD` (ex. `1.2.0.0`). Le **tag git** est identique, préfixé de `v` (`v1.2.0.0`).
 
-1. Dans une PR : passer `version` à `X.Y.Z.0` dans `meta.json` **et** `AssemblyVersion`/`FileVersion` dans le `.csproj` (la CI vérifie la cohérence) ; adapter `targetAbi` si besoin ; mettre à jour `CHANGELOG.md`.
+1. Dans une PR : passer `version` à `X.Y.Z.W` dans `meta.json` **et** `AssemblyVersion`/`FileVersion` dans le `.csproj` (la CI vérifie la cohérence) ; adapter `targetAbi` si besoin ; mettre à jour `CHANGELOG.md`.
 2. Fusionner la PR, puis tagger `main` :
    ```bash
    git switch main && git pull
-   git tag vX.Y.Z && git push origin vX.Y.Z
+   git tag vX.Y.Z.W && git push origin vX.Y.Z.W
    ```
 3. La CI (`release.yml`) compile, crée la release GitHub avec le zip, puis commite `manifest.json` (URL + checksum MD5) sur `main`. Le plugin est alors proposé dans le catalogue Jellyfin.
 
