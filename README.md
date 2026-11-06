@@ -92,7 +92,7 @@ Une faille ? Ouvrez un [signalement privé](https://github.com/timothe-ignace/je
 
 | Plugin | Jellyfin |
 |---|---|
-| 1.0.x | 12.1+ (testé en 12.4) |
+| 1.x | 12.1+ (testé en 12.4) |
 
 Le plugin est compilé pour une version précise de Jellyfin (`targetAbi`). Après une montée de version majeure de Jellyfin, attendez une nouvelle version du plugin.
 
@@ -125,10 +125,14 @@ scripts/                      empaquetage et mise à jour du manifeste
 
 ### Publier une version
 
-1. Dans une PR : incrémenter `version` dans `meta.json` **et** `AssemblyVersion`/`FileVersion` dans le `.csproj` (la CI vérifie qu'elles concordent) ; adapter `targetAbi` si besoin ; mettre à jour `CHANGELOG.md`.
+Versionnage [SemVer](https://semver.org/lang/fr/) : `MAJOR.MINOR.PATCH` (correctif, nouveauté compatible, changement cassant).
+Jellyfin impose quatre chiffres : la version du plugin est donc `X.Y.Z.0` dans `meta.json` et le `.csproj`, tandis que le **tag git** est `vX.Y.Z`.
+
+1. Dans une PR : passer `version` à `X.Y.Z.0` dans `meta.json` **et** `AssemblyVersion`/`FileVersion` dans le `.csproj` (la CI vérifie la cohérence) ; adapter `targetAbi` si besoin ; mettre à jour `CHANGELOG.md`.
 2. Fusionner la PR, puis tagger `main` :
    ```bash
-   git tag v1.1.0.0 && git push origin v1.1.0.0
+   git switch main && git pull
+   git tag vX.Y.Z && git push origin vX.Y.Z
    ```
 3. La CI (`release.yml`) compile, crée la release GitHub avec le zip, puis commite `manifest.json` (URL + checksum MD5) sur `main`. Le plugin est alors proposé dans le catalogue Jellyfin.
 
