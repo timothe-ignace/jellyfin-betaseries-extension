@@ -8,6 +8,14 @@
     "category": "General",
     "versions": [
       {
+        "version": "1.0.2.0",
+        "changelog": "- Release 1.0.2.0 (#6) - Translate the whole repository to English (#5) - Retour au versionnage à 4 chiffres X.Y.Z.W (#4) - chore(release): manifest v1.0.1",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/timothe-ignace/jellyfin-betaseries-extension/releases/download/v1.0.2.0/BetaSeries_1.0.2.0.zip",
+        "checksum": "45225e13aa884478462f9348caf9fbed",
+        "timestamp": "2026-11-06T21:31:39Z"
+      },
+      {
         "version": "1.0.1.0",
         "changelog": "- Release automation (CI, release workflow, manifest)\n- Bump Newtonsoft.Json from 13.0.3 to 13.0.4",
         "targetAbi": "12.1.0.0",
