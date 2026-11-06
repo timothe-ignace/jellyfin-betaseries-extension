@@ -1,0 +1,20 @@
+[
+  {
+    "guid": "b7d3a1f2-5c64-4e8a-9a1d-3f0b6c2e7a91",
+    "name": "BetaSeries",
+    "description": "Synchronise les épisodes et films vus avec BetaSeries (multi-utilisateur).",
+    "overview": "Sync BetaSeries",
+    "owner": "Timothé IGNACE",
+    "category": "General",
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "changelog": "Première version : synchronisation multi-utilisateur des épisodes et films vus.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/timothe-ignace/jellyfin-betaseries-extension/releases/download/v1.0.0.0/BetaSeries_1.0.0.0.zip",
+        "checksum": "189a4558313f4fed0b45fa35ed7eee21",
+        "timestamp": "2026-11-06T20:34:29Z"
+      }
+    ]
+  }
+]
