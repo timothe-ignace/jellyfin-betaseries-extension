@@ -2,6 +2,14 @@
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.4.0] - 2026-11-06
+
+### Fixed
+- 1.0.3.0: the user page stayed on "Loading…" because a syntax error in its script prevented it from starting.
+
+### Added
+- CI now syntax-checks the JavaScript of the plugin pages (`node --check`).
+
 ## [1.0.3.0] - 2026-11-06
 
 ### Added
