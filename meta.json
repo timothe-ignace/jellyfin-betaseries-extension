@@ -1,0 +1,14 @@
+{
+  "category": "General",
+  "description": "Synchronise les épisodes et films vus avec BetaSeries (multi-utilisateur).",
+  "guid": "b7d3a1f2-5c64-4e8a-9a1d-3f0b6c2e7a91",
+  "name": "BetaSeries",
+  "overview": "Sync BetaSeries",
+  "owner": "Timothé IGNACE",
+  "targetAbi": "12.1.0.0",
+  "timestamp": "2026-11-06T00:00:00.0000000Z",
+  "version": "1.0.0.0",
+  "status": "Active",
+  "autoUpdate": false,
+  "assemblies": []
+}
