@@ -8,17 +8,17 @@
       <form id="BetaSeriesConfigForm">
         <h2>BetaSeries</h2>
         <div class="inputContainer">
-          <input is="emby-input" type="text" id="ApiKey" label="BetaSeries API key" />
-          <div class="fieldDescription">Create one at https://www.betaseries.com/api/ ("Client ID" field). Shared by all users.</div>
+          <input is="emby-input" type="text" id="ApiKey" label="BetaSeries API key" data-i18n-label="admin.apiKey" />
+          <div class="fieldDescription" data-i18n="admin.apiKeyHelp">Create one at https://www.betaseries.com/api/ ("Client ID" field). Shared by all users.</div>
         </div>
         <div class="checkboxContainer checkboxContainer-withDescription">
           <label class="emby-checkbox-label">
             <input is="emby-checkbox" type="checkbox" id="SyncMovies" />
-            <span>Also sync movies</span>
+            <span data-i18n="admin.syncMovies">Also sync movies</span>
           </label>
         </div>
-        <p>Each user links their own account from the "BetaSeries" entry in their preferences.</p>
-        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Save</span></button>
+        <p data-i18n="admin.userHelp">Each user links their own account from the "BetaSeries" entry in their settings.</p>
+        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span data-i18n="admin.save">Save</span></button>
       </form>
     </div>
   </div>
@@ -26,8 +26,28 @@
     (function () {
       var pluginId = 'b7d3a1f2-5c64-4e8a-9a1d-3f0b6c2e7a91';
       var page = document.querySelector('#BetaSeriesConfigPage');
+      var dict = {};
+
+      function t(key) { return dict[key] || key; }
+      function applyI18n() {
+        page.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = t(el.getAttribute('data-i18n')); });
+        page.querySelectorAll('[data-i18n-label]').forEach(function (el) {
+          var text = t(el.getAttribute('data-i18n-label'));
+          el.setAttribute('label', text);
+          var lbl = el.parentNode && el.parentNode.querySelector('label');
+          if (lbl) { lbl.textContent = text; }
+        });
+      }
+      // Jellyfin keeps the UI language of the current user in <html lang>.
+      function loadI18n() {
+        var lang = document.documentElement.getAttribute('lang') || navigator.language || 'en';
+        return ApiClient.ajax({ type: 'GET', url: ApiClient.getUrl('BetaSeries/Locale/' + encodeURIComponent(lang)), dataType: 'json' })
+          .then(function (d) { dict = d || {}; applyI18n(); }, function () { dict = {}; });
+      }
+
       page.addEventListener('pageshow', function () {
         Dashboard.showLoadingMsg();
+        loadI18n();
         ApiClient.getPluginConfiguration(pluginId).then(function (c) {
           page.querySelector('#ApiKey').value = c.ApiKey || '';
           page.querySelector('#SyncMovies').checked = c.SyncMovies !== false;

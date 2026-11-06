@@ -2,6 +2,15 @@
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.3.0] - 2026-11-06
+
+### Added
+- The plugin pages now follow the user's Jellyfin display language (English, French, Spanish, German; English fallback). New languages are a single JSON file in `Configuration/i18n/`.
+
+### Changed
+- The API returns error codes (with an English message) so the page can translate them.
+- CI checks that all translation files have the same keys.
+
 ## [1.0.2.0] - 2026-11-06
 
 ### Changed

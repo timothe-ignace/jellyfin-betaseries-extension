@@ -67,6 +67,12 @@ That's it: your next views are synced. To stop, click **Unlink my account** on t
 - Marking an episode does **not** check the previous episodes on BetaSeries.
 - Items without a TVDB/IMDb/TMDb identifier (missing metadata) are skipped; a log line tells you so.
 
+## Languages
+
+The plugin pages follow each user's Jellyfin display language. Available: English, French, Spanish, German. Other languages fall back to English.
+
+**Adding a language:** copy `Jellyfin.Plugin.BetaSeries/Configuration/i18n/en.json` to `<code>.json` (e.g. `it.json`, or `pt-br.json` for a regional variant), translate the values (keep the keys and `{login}`-style placeholders), and open a pull request. CI checks that every file has exactly the same keys as `en.json`.
+
 ## Troubleshooting
 
 Search for `BetaSeries` in the Jellyfin logs (*Dashboard → Logs*, or `docker logs jellyfin | grep BetaSeries`).

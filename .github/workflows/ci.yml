@@ -26,6 +26,20 @@ jobs:
           csproj=$(sed -n 's:.*<AssemblyVersion>\(.*\)</AssemblyVersion>.*:\1:p' Jellyfin.Plugin.BetaSeries/Jellyfin.Plugin.BetaSeries.csproj)
           [ "$meta" = "$csproj" ] || { echo "::error::meta.json ($meta) and AssemblyVersion ($csproj) differ"; exit 1; }
           [[ "$meta" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::version must have 4 parts (X.Y.Z.W, Jellyfin format), found $meta"; exit 1; }
+      - name: Check translations
+        run: |
+          python3 - <<'PY'
+          import glob, json, os, sys
+          d = "Jellyfin.Plugin.BetaSeries/Configuration/i18n"
+          base = set(json.load(open(f"{d}/en.json", encoding="utf-8")))
+          bad = False
+          for f in sorted(glob.glob(f"{d}/*.json")):
+              keys = set(json.load(open(f, encoding="utf-8")))
+              if keys != base:
+                  bad = True
+                  print(f"::error file={f}::missing={sorted(base - keys)} extra={sorted(keys - base)}")
+          sys.exit(1 if bad else 0)
+          PY
       - name: Build (warnings as errors)
         run: dotnet build Jellyfin.Plugin.BetaSeries -c Release -warnaserror -o build-out
       - name: Package
