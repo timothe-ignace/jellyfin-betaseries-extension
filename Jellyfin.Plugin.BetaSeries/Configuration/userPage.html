@@ -6,25 +6,25 @@
   <div data-role="content">
     <div class="content-primary">
       <h2>BetaSeries</h2>
-      <p id="bsStatus">Loading…</p>
+      <p id="bsStatus" data-i18n="user.loading">Loading…</p>
       <p id="bsError" style="color:#e55"></p>
 
       <div id="bsLinked" style="display:none">
-        <button is="emby-button" type="button" id="bsUnlink" class="raised emby-button"><span>Unlink my account</span></button>
+        <button is="emby-button" type="button" id="bsUnlink" class="raised emby-button"><span data-i18n="user.unlink">Unlink my account</span></button>
       </div>
 
       <div id="bsUnlinked" style="display:none">
-        <h3>Sign in with my account</h3>
+        <h3 data-i18n="user.signInTitle">Sign in with my account</h3>
         <form id="bsLoginForm">
-          <div class="inputContainer"><input is="emby-input" type="text" id="bsLogin" label="BetaSeries login" required /></div>
-          <div class="inputContainer"><input is="emby-input" type="password" id="bsPassword" label="Password" required /></div>
-          <div class="fieldDescription">The password is only used to obtain a token and is never stored.</div>
-          <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Sign in</span></button>
+          <div class="inputContainer"><input is="emby-input" type="text" id="bsLogin" label="BetaSeries login" data-i18n-label="user.login" required /></div>
+          <div class="inputContainer"><input is="emby-input" type="password" id="bsPassword" label="Password" data-i18n-label="user.password" required /></div>
+          <div class="fieldDescription" data-i18n="user.passwordHelp">The password is only used to obtain a token and is never stored.</div>
+          <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span data-i18n="user.signIn">Sign in</span></button>
         </form>
-        <h3>Or paste a token</h3>
+        <h3 data-i18n="user.tokenTitle">Or paste a token</h3>
         <form id="bsTokenForm">
-          <div class="inputContainer"><input is="emby-input" type="text" id="bsToken" label="BetaSeries token" required /></div>
-          <button is="emby-button" type="submit" class="raised block emby-button"><span>Save token</span></button>
+          <div class="inputContainer"><input is="emby-input" type="text" id="bsToken" label="BetaSeries token" data-i18n-label="user.token" required /></div>
+          <button is="emby-button" type="submit" class="raised block emby-button"><span data-i18n="user.saveToken">Save token</span></button>
         </form>
       </div>
     </div>
@@ -32,7 +32,30 @@
   <script type="text/javascript">
     (function () {
       var page = document.querySelector('#BetaSeriesUserPage');
+      var dict = {};
       function q(s) { return page.querySelector(s); }
+
+      function t(key, vars) {
+        var s = dict[key] || key;
+        if (vars) { Object.keys(vars).forEach(function (k) { s = s.replace('{' + k + '}', function () { return vars[k]; }); // function: no special $ handling }); }
+        return s;
+      }
+      function applyI18n() {
+        page.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = t(el.getAttribute('data-i18n')); });
+        page.querySelectorAll('[data-i18n-label]').forEach(function (el) {
+          var text = t(el.getAttribute('data-i18n-label'));
+          el.setAttribute('label', text);
+          var lbl = el.parentNode && el.parentNode.querySelector('label');
+          if (lbl) { lbl.textContent = text; }
+        });
+      }
+      // Jellyfin keeps the UI language of the current user in <html lang>.
+      function loadI18n() {
+        var lang = document.documentElement.getAttribute('lang') || navigator.language || 'en';
+        return call('GET', 'Locale/' + encodeURIComponent(lang))
+          .then(function (d) { dict = d || {}; applyI18n(); }, function () { dict = {}; });
+      }
+
       function call(method, path, body) {
         return ApiClient.ajax({
           type: method,
@@ -42,25 +65,31 @@
           dataType: 'json'
         });
       }
+      // The server answers { Code, Error }: show the translated message for known codes, else the server's text.
       function showError(err) {
-        var msg = 'Error.';
-        if (err && err.json) { err.json().then(function (j) { q('#bsError').textContent = j.Error || msg; }).catch(function () { q('#bsError').textContent = msg; }); }
-        else { q('#bsError').textContent = msg; }
-        Dashboard.hideLoadingMsg();
+        function show(j) {
+          var msg = (j && j.Code && dict['error.' + j.Code]) || (j && j.Error) || t('error.generic');
+          q('#bsError').textContent = msg;
+          Dashboard.hideLoadingMsg();
+        }
+        if (err && err.json) { err.json().then(show).catch(function () { show(null); }); } else { show(null); }
       }
       function refresh() {
         q('#bsError').textContent = '';
         call('GET', 'Status').then(function (s) {
           q('#bsLinked').style.display = s.Linked ? '' : 'none';
           q('#bsUnlinked').style.display = s.Linked ? 'none' : '';
-          if (!s.ServerConfigured) { q('#bsStatus').textContent = "The plugin has not been configured by the administrator yet."; }
-          else if (s.Linked && s.Valid) { q('#bsStatus').textContent = 'Linked to BetaSeries account: ' + s.Login; }
-          else if (s.Linked) { q('#bsStatus').textContent = 'Saved token is invalid or expired: please sign in again.'; q('#bsUnlinked').style.display = ''; }
-          else { q('#bsStatus').textContent = "No account linked: your playback is not being synced."; }
+          if (!s.ServerConfigured) { q('#bsStatus').textContent = t('user.notConfigured'); }
+          else if (s.Linked && s.Valid) { q('#bsStatus').textContent = t('user.linked', { login: s.Login }); }
+          else if (s.Linked) { q('#bsStatus').textContent = t('user.invalid'); q('#bsUnlinked').style.display = ''; }
+          else { q('#bsStatus').textContent = t('user.unlinked'); }
           Dashboard.hideLoadingMsg();
         }, showError);
       }
-      page.addEventListener('pageshow', function () { Dashboard.showLoadingMsg(); refresh(); });
+      page.addEventListener('pageshow', function () {
+        Dashboard.showLoadingMsg();
+        loadI18n().then(refresh);
+      });
       q('#bsLoginForm').addEventListener('submit', function (e) {
         e.preventDefault(); Dashboard.showLoadingMsg();
         call('POST', 'Login', { Login: q('#bsLogin').value, Password: q('#bsPassword').value })

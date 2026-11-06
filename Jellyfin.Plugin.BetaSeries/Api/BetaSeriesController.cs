@@ -37,6 +37,10 @@ public partial class BetaSeriesController : ControllerBase
         return Guid.TryParse(raw, out var id) ? id : null;
     }
 
+    /// <summary>Web UI translations for the caller's language (falls back to English).</summary>
+    [HttpGet("Locale/{culture}")]
+    public ContentResult Locale(string culture) => Content(Localizer.Load(culture), MediaTypeNames.Application.Json);
+
     [HttpGet("Status")]
     public async Task<ActionResult> Status(CancellationToken ct)
     {
@@ -54,14 +58,14 @@ public partial class BetaSeriesController : ControllerBase
     {
         var uid = CurrentUserId();
         if (uid is null) { return Unauthorized(); }
-        if (string.IsNullOrEmpty(Plugin.Instance?.Configuration.ApiKey)) { return BadRequest(new { Error = "The plugin is not configured (missing API key)." }); }
+        if (string.IsNullOrEmpty(Plugin.Instance?.Configuration.ApiKey)) { return BadRequest(new { Code = "not_configured", Error = "The plugin is not configured (missing API key)." }); }
         if (string.IsNullOrWhiteSpace(req?.Login) || string.IsNullOrEmpty(req.Password) || req.Login.Length > 128 || req.Password.Length > 256)
         {
-            return BadRequest(new { Error = "Invalid login or password." });
+            return BadRequest(new { Code = "invalid_login", Error = "Invalid login or password." });
         }
 
         var (token, error) = await _client.LoginAsync(req.Login, req.Password, ct).ConfigureAwait(false);
-        if (token is null) { return BadRequest(new { Error = error }); }
+        if (token is null) { return BadRequest(new { Code = "betaseries_error", Error = error }); }
         _tokens.Set(uid.Value, token);
         return Ok(new { Login = req.Login });
     }
@@ -71,11 +75,11 @@ public partial class BetaSeriesController : ControllerBase
     {
         var uid = CurrentUserId();
         if (uid is null) { return Unauthorized(); }
-        if (string.IsNullOrEmpty(Plugin.Instance?.Configuration.ApiKey)) { return BadRequest(new { Error = "The plugin is not configured (missing API key)." }); }
+        if (string.IsNullOrEmpty(Plugin.Instance?.Configuration.ApiKey)) { return BadRequest(new { Code = "not_configured", Error = "The plugin is not configured (missing API key)." }); }
         var token = req?.Token?.Trim() ?? string.Empty;
-        if (!TokenPattern().IsMatch(token)) { return BadRequest(new { Error = "Invalid token format." }); }
+        if (!TokenPattern().IsMatch(token)) { return BadRequest(new { Code = "invalid_token_format", Error = "Invalid token format." }); }
         var login = await _client.GetLoginAsync(token, ct).ConfigureAwait(false);
-        if (login is null) { return BadRequest(new { Error = "Invalid token." }); }
+        if (login is null) { return BadRequest(new { Code = "invalid_token", Error = "Invalid token." }); }
         _tokens.Set(uid.Value, token);
         return Ok(new { Login = login });
     }
