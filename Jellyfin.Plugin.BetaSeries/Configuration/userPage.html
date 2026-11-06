@@ -37,7 +37,7 @@
 
       function t(key, vars) {
         var s = dict[key] || key;
-        if (vars) { Object.keys(vars).forEach(function (k) { s = s.replace('{' + k + '}', vars[k]); }); }
+        if (vars) { Object.keys(vars).forEach(function (k) { s = s.replace('{' + k + '}', function () { return vars[k]; }); // function: no special $ handling }); }
         return s;
       }
       function applyI18n() {
