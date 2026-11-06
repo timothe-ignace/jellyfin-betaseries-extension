@@ -8,6 +8,14 @@
     "category": "General",
     "versions": [
       {
+        "version": "1.0.4.0",
+        "changelog": "- Fix user page stuck on \"Loading…\" (1.0.4.0) (#8) - chore(release): manifest v1.0.3.0",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/timothe-ignace/jellyfin-betaseries-extension/releases/download/v1.0.4.0/BetaSeries_1.0.4.0.zip",
+        "checksum": "6cf8ccd9864aab7503cc3381bba5fb17",
+        "timestamp": "2026-11-06T21:50:39Z"
+      },
+      {
         "version": "1.0.3.0",
         "changelog": "- Localize the plugin pages to the user's language (1.0.3.0) (#7) - chore(release): manifest v1.0.2.0",
         "targetAbi": "12.1.0.0",
