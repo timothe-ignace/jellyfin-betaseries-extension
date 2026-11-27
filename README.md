@@ -124,6 +124,20 @@ scripts/                      packaging and manifest update
 .github/workflows/            CI and release
 ```
 
+### Linting
+
+CI runs these checks; run them locally before opening a pull request:
+
+```bash
+npm ci --ignore-scripts && npm run lint           # JavaScript, including scripts in the HTML pages
+dotnet format Jellyfin.Plugin.BetaSeries          # C# formatting
+ruff check && ruff format --diff                  # Python
+shellcheck build.sh release.sh scripts/*.sh       # shell
+actionlint                                        # GitHub workflows
+```
+
+C# code analyzers run during the build; CI treats their warnings as errors. Rules are tuned in `.editorconfig`.
+
 ### Git workflow
 
 - Work on a branch (`feat/…`, `fix/…`) and open a pull request against `main`; CI builds (warnings as errors) and packages.

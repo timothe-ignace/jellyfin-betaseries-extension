@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "description": "Development tooling only: nothing here ships in the plugin.",
+  "scripts": {
+    "lint": "eslint Jellyfin.Plugin.BetaSeries/Configuration"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.15.0",
+    "eslint-plugin-html": "^8.2.1",
+    "globals": "^17.14.0"
+  }
+}
