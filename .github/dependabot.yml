@@ -3,9 +3,22 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: monthly }
+    commit-message: { prefix: ci }
+    groups:
+      actions:
+        patterns: ["*"]
   - package-ecosystem: nuget
     directory: /Jellyfin.Plugin.BetaSeries
     schedule: { interval: monthly }
+    commit-message: { prefix: build }
     # Jellyfin.Controller must stay aligned with the targeted Jellyfin version: update it manually.
     ignore:
       - dependency-name: Jellyfin.Controller
+  # Development tooling only (ESLint): nothing from npm ships in the plugin.
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: monthly }
+    commit-message: { prefix: build }
+    groups:
+      eslint:
+        patterns: ["*"]

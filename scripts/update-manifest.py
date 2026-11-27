@@ -4,6 +4,7 @@
 Usage: update-manifest.py <repo owner/name> <zip> <changelog>
 Reads meta.json (or $META_PATH) for the plugin metadata and computes the zip MD5.
 """
+
 import datetime
 import hashlib
 import json
@@ -11,10 +12,12 @@ import os
 import sys
 
 repo, zip_path, changelog = sys.argv[1:4]
-meta = json.load(open(os.environ.get("META_PATH", "meta.json"), encoding="utf-8"))
+with open(os.environ.get("META_PATH", "meta.json"), encoding="utf-8") as f:
+    meta = json.load(f)
 version, abi = meta["version"], meta["targetAbi"]
 tag = "v" + version
-md5 = hashlib.md5(open(zip_path, "rb").read()).hexdigest()
+with open(zip_path, "rb") as f:
+    md5 = hashlib.md5(f.read()).hexdigest()
 entry = {
     "version": version,
     "changelog": changelog,
@@ -23,7 +26,10 @@ entry = {
     "checksum": md5,
     "timestamp": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
 }
-manifest = json.load(open("manifest.json", encoding="utf-8")) if os.path.exists("manifest.json") else []
+manifest = []
+if os.path.exists("manifest.json"):
+    with open("manifest.json", encoding="utf-8") as f:
+        manifest = json.load(f)
 plugin = next((p for p in manifest if p["guid"] == meta["guid"]), None)
 if plugin is None:
     plugin = {k: meta[k] for k in ("guid", "name", "description", "overview", "owner", "category")}

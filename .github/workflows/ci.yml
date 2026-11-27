@@ -13,6 +13,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Lint JavaScript (including scripts inside the HTML pages)
+        run: |
+          npm ci --ignore-scripts
+          npm run lint
+      - uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89 # v4.1.0
+        with:
+          version: "0.17.6"
+          args: check
+      - name: Check Python formatting
+        run: ruff format --diff
+      - name: Lint shell scripts
+        run: shellcheck build.sh release.sh scripts/*.sh
+      - name: Lint workflows
+        run: docker run --rm -v "$PWD":/repo:ro -w /repo rhysd/actionlint:1.7.12 -color
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -26,19 +49,8 @@ jobs:
           csproj=$(sed -n 's:.*<AssemblyVersion>\(.*\)</AssemblyVersion>.*:\1:p' Jellyfin.Plugin.BetaSeries/Jellyfin.Plugin.BetaSeries.csproj)
           [ "$meta" = "$csproj" ] || { echo "::error::meta.json ($meta) and AssemblyVersion ($csproj) differ"; exit 1; }
           [[ "$meta" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::version must have 4 parts (X.Y.Z.W, Jellyfin format), found $meta"; exit 1; }
-      - name: Check JavaScript syntax
-        run: |
-          mkdir -p "$RUNNER_TEMP/js"
-          python3 - "$RUNNER_TEMP/js" <<'PY'
-          import glob, os, re, sys
-          out = sys.argv[1]
-          for f in glob.glob("Jellyfin.Plugin.BetaSeries/Configuration/*.html"):
-              for i, m in enumerate(re.finditer(r"<script[^>]*>(.*?)</script>", open(f, encoding="utf-8").read(), re.S)):
-                  open(os.path.join(out, f"{os.path.basename(f)}.{i}.js"), "w", encoding="utf-8").write(m.group(1))
-          PY
-          for f in "$RUNNER_TEMP"/js/*.js Jellyfin.Plugin.BetaSeries/Configuration/*.js; do
-            echo "node --check $f"; node --check "$f"
-          done
+      - name: Check C# formatting
+        run: dotnet format Jellyfin.Plugin.BetaSeries --verify-no-changes
       - name: Check translations
         run: |
           python3 - <<'PY'

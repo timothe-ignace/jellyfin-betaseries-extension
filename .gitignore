@@ -6,3 +6,5 @@ dist/
 .vs/
 .idea/
 build-out/
+node_modules/
+.ruff_cache/

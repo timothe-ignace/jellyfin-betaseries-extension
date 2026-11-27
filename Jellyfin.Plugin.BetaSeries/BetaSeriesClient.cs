@@ -50,7 +50,9 @@ public class BetaSeriesClient
     /// <summary>Exchanges login/password for a token. The password is never stored.</summary>
     public async Task<(string? Token, string? Error)> LoginAsync(string login, string password, CancellationToken ct)
     {
+#pragma warning disable CA5351 // The BetaSeries /members/auth endpoint requires an MD5 password hash.
         var md5 = Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(password))).ToLowerInvariant();
+#pragma warning restore CA5351
         var (ok, json, raw) = await SendAsync(HttpMethod.Post, "/members/auth",
             new Dictionary<string, string> { ["login"] = login, ["password"] = md5 }, null, ct).ConfigureAwait(false);
         if (ok && json is not null && json.RootElement.TryGetProperty("token", out var t))
