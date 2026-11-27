@@ -8,7 +8,9 @@ updates:
       actions:
         patterns: ["*"]
   - package-ecosystem: nuget
-    directory: /Jellyfin.Plugin.BetaSeries
+    directories:
+      - /Jellyfin.Plugin.BetaSeries
+      - /Jellyfin.Plugin.BetaSeries.Tests
     schedule: { interval: monthly }
     commit-message: { prefix: build }
     # Jellyfin.Controller must stay aligned with the targeted Jellyfin version: update it manually.

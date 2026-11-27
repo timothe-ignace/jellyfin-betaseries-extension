@@ -124,6 +124,14 @@ scripts/                      packaging and manifest update
 .github/workflows/            CI and release
 ```
 
+### Tests
+
+```bash
+dotnet test --project Jellyfin.Plugin.BetaSeries.Tests
+```
+
+The tests cover the BetaSeries client (against a fake HTTP handler) and token storage. CI runs them on every pull request.
+
 ### Linting
 
 CI runs these checks; run them locally before opening a pull request:
@@ -159,7 +167,7 @@ Versions have **4 parts**, like every Jellyfin plugin: `MAJOR.MINOR.PATCH.BUILD`
 
 ### Targeting a new Jellyfin version
 
-Adjust `Jellyfin.Controller` in the `.csproj` (deliberately pinned, ignored by Dependabot) and `targetAbi` in `meta.json`, then build.
+Adjust `Jellyfin.Controller` in both `.csproj` files (deliberately pinned, ignored by Dependabot) and `targetAbi` in `meta.json`, then build.
 
 ## License
 
